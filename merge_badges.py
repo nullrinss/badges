@@ -27,10 +27,8 @@ PROTECTED_IDS = {
     "372557867300945921",
 }
 
-
 PROTECTED_SPECIAL_IDS = {
-    "",
-    
+    "372557867300945921",
 }
 
 YOUR_REPO_FILE = "badges.json"
@@ -59,28 +57,24 @@ def smart_merge(your_data: Dict, original_data: Dict,
                 protected_ids: Set[str], protected_special: Set[str]) -> Dict:
     merged = {}
 
-    
     for user_id in protected_ids:
         if user_id in your_data:
             merged[user_id] = your_data[user_id]
 
     for user_id, badges in original_data.items():
         if user_id == "special":
-            continue  
+            continue
         if user_id not in protected_ids:
             merged[user_id] = badges
 
-    
     your_special = your_data.get("special", {})
     original_special = original_data.get("special", {})
     merged_special = {}
 
-    
     for user_id, value in original_special.items():
         if user_id not in protected_special:
             merged_special[user_id] = value
 
-    
     for user_id in protected_special:
         if user_id in your_special:
             merged_special[user_id] = your_special[user_id]
