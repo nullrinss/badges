@@ -5,45 +5,37 @@ from typing import Dict, Set
 import sys
 
 PROTECTED_IDS = {
-
-
-
-
-
-
-   
-
-
-
-
-
-
-   
-   
-   "1174588954549428240",
-   "1238193867220713613",
-   # Remove 1064108738430124062
-   "1155045461615448170",
-   "1169063058438619197",
-   "1030911688079331489",
-   "1071078540059095090",
-   "393173517895729152",
-   "374833670487277569",
-   "536113651409616896",
-   "1334437326520320011",
-   "1249031224962453667",
-   "562976006009389056",
-   "776986525362683904",
-   "1098332120960737410",
-   "1096181296587341906",
-   "1156258535563350047",
-   "507224661692514334",
-   "1224867112556826735",
-   "762103548569059338",
-   "372557867300945921",
+    "1174588954549428240",
+    "1238193867220713613",
+    "1155045461615448170",
+    "1169063058438619197",
+    "1030911688079331489",
+    "1071078540059095090",
+    "393173517895729152",
+    "374833670487277569",
+    "536113651409616896",
+    "1334437326520320011",
+    "1249031224962453667",
+    "562976006009389056",
+    "776986525362683904",
+    "1098332120960737410",
+    "1096181296587341906",
+    "1156258535563350047",
+    "507224661692514334",
+    "1224867112556826735",
+    "762103548569059338",
+    "372557867300945921",
 }
+
+
+PROTECTED_SPECIAL_IDS = {
+    "",
+    
+}
+
 YOUR_REPO_FILE = "badges.json"
 ORIGINAL_URL = "https://badges.vencord.dev/badges.json"
+
 
 def load_local_file(filepath: str) -> Dict:
     try:
@@ -51,6 +43,7 @@ def load_local_file(filepath: str) -> Dict:
             return json.load(f)
     except FileNotFoundError:
         return {}
+
 
 def download_original(url: str) -> Dict:
     try:
@@ -61,29 +54,60 @@ def download_original(url: str) -> Dict:
         print(f"Error: {e}")
         sys.exit(1)
 
-def smart_merge(your_data: Dict, original_data: Dict, protected_ids: Set[str]) -> Dict:
+
+def smart_merge(your_data: Dict, original_data: Dict,
+                protected_ids: Set[str], protected_special: Set[str]) -> Dict:
     merged = {}
+
     
     for user_id in protected_ids:
         if user_id in your_data:
             merged[user_id] = your_data[user_id]
-    
+
     for user_id, badges in original_data.items():
+        if user_id == "special":
+            continue  
         if user_id not in protected_ids:
             merged[user_id] = badges
+
     
+    your_special = your_data.get("special", {})
+    original_special = original_data.get("special", {})
+    merged_special = {}
+
+    
+    for user_id, value in original_special.items():
+        if user_id not in protected_special:
+            merged_special[user_id] = value
+
+    
+    for user_id in protected_special:
+        if user_id in your_special:
+            merged_special[user_id] = your_special[user_id]
+
+    for user_id, value in your_special.items():
+        if user_id not in merged_special:
+            merged_special[user_id] = value
+
+    if merged_special:
+        merged["special"] = merged_special
+
     return merged
+
 
 def save_file(data: Dict, filepath: str):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
 
+
 def main():
     your_data = load_local_file(YOUR_REPO_FILE)
     original_data = download_original(ORIGINAL_URL)
-    merged_data = smart_merge(your_data, original_data, PROTECTED_IDS)
+    merged_data = smart_merge(your_data, original_data,
+                              PROTECTED_IDS, PROTECTED_SPECIAL_IDS)
     save_file(merged_data, YOUR_REPO_FILE)
     print("Done")
+
 
 if __name__ == "__main__":
     main()
