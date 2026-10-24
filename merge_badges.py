@@ -29,6 +29,7 @@ PROTECTED_IDS = {
 
 PROTECTED_SPECIAL_IDS = {
     "",
+    "372557867300945921",
 }
 
 YOUR_REPO_FILE = "badges.json"
