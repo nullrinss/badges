@@ -4,6 +4,10 @@ import requests
 from typing import Dict, Set
 import sys
 
+
+
+
+
 PROTECTED_IDS = {
     "1174588954549428240",
     "1238193867220713613",
@@ -28,9 +32,10 @@ PROTECTED_IDS = {
     "452518694904397835",
 }
 
+
+
 PROTECTED_SPECIAL_IDS = {
-    "",
-    "372557867300945921",
+
 }
 
 YOUR_REPO_FILE = "badges.json"
